@@ -1,0 +1,11 @@
+resources:
+  - local-path-storage.yaml
+patches:
+  - target:
+      kind: StorageClass
+      name: local-path
+    patch: |-
+      - op: add
+        path: /metadata/annotations
+        value:
+          storageclass.kubernetes.io/is-default-class: "true"
