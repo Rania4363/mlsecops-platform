@@ -27,11 +27,10 @@ spec:
     spec:
       containers:
         - name: mlflow
-          image: ghcr.io/mlflow/mlflow:v3.18.0
+          image: ghcr.io/rania4363/mlflow-server:3.18.0-2@sha256:64a0a0bfca4641c7f34a91739551d7d0ca5ed73f69256a99c51869e96806e8a6
           command: ["/bin/sh", "-c"]
           args:
             - |
-              pip install --no-cache-dir psycopg2-binary boto3 &&
               exec mlflow server \
                 --host 0.0.0.0 --port 5000 \
                 --backend-store-uri "postgresql+psycopg2://mlflow:${DB_PASSWORD}@mlflow-postgres:5432/mlflow" \
