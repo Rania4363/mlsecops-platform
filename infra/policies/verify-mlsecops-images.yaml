@@ -3,10 +3,13 @@ kind: ImageValidatingPolicy
 metadata:
   name: verify-mlsecops-images
 spec:
-  validationActions: [Audit]
+  validationActions: [Deny]
   evaluation:
     mode: Kubernetes
   matchConstraints:
+    namespaceSelector:
+      matchLabels:
+        signed-images: required
     resourceRules:
       - apiGroups: [""]
         apiVersions: ["v1"]

@@ -13,6 +13,9 @@ spec:
     server: https://kubernetes.default.svc
     namespace: mlflow
   syncPolicy:
+    managedNamespaceMetadata:
+      labels:
+        signed-images: required
     automated:
       prune: true
       selfHeal: true
