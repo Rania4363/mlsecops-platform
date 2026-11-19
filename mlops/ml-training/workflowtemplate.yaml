@@ -25,6 +25,8 @@ spec:
             value: "{{workflow.parameters.drift}}"
           - name: N_SAMPLES
             value: "{{workflow.parameters.n-samples}}"
+          - name: GIT_PYTHON_REFRESH
+            value: quiet
         resources:
           requests:
             cpu: 500m

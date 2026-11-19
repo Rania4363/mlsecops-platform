@@ -4,6 +4,8 @@ metadata:
   name: verify-mlsecops-images
 spec:
   validationActions: [Deny]
+  webhookConfiguration:
+    timeoutSeconds: 30
   evaluation:
     mode: Kubernetes
   matchConstraints:
