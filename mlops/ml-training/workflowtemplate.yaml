@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: churn-training
+  namespace: ml-training
+spec:
+  entrypoint: train
+  serviceAccountName: argo-workflow-runner
+  ttlStrategy:
+    secondsAfterCompletion: 3600
+  arguments:
+    parameters:
+      - name: drift
+        value: "0.0"
+      - name: n-samples
+        value: "5000"
+  templates:
+    - name: train
+      container:
+        image: ghcr.io/rania4363/churn-training:1@sha256:033cea4c7af4fd69d4d143eace8f0840f93c697f20682263df13b47853c52b99
+        env:
+          - name: MLFLOW_TRACKING_URI
+            value: http://mlflow.mlflow:5000
+          - name: DRIFT
+            value: "{{workflow.parameters.drift}}"
+          - name: N_SAMPLES
+            value: "{{workflow.parameters.n-samples}}"
+        resources:
+          requests:
+            cpu: 500m
+            memory: 512Mi
+          limits:
+            cpu: "2"
+            memory: 2Gi
+        securityContext:
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
