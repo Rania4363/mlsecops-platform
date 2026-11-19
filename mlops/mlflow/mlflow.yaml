@@ -35,7 +35,8 @@ spec:
                 --host 0.0.0.0 --port 5000 \
                 --backend-store-uri "postgresql+psycopg2://mlflow:${DB_PASSWORD}@mlflow-postgres:5432/mlflow" \
                 --artifacts-destination s3://mlflow/ \
-                --serve-artifacts
+                --serve-artifacts \
+                --allowed-hosts "mlflow.mlflow,mlflow.mlflow:*,mlflow.mlflow.svc,mlflow.mlflow.svc:*,mlflow.mlflow.svc.cluster.local,mlflow.mlflow.svc.cluster.local:*,localhost,localhost:*,127.0.0.1,127.0.0.1:*,192.168.*,10.*"
           ports:
             - containerPort: 5000
           env:
