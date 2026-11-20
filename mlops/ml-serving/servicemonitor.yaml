@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: churn-serving
+  namespace: ml-serving
+  labels:
+    release: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: churn-serving
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s

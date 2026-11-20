@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: churn-serving
+  namespace: ml-serving
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: churn-serving
+  template:
+    metadata:
+      labels:
+        app: churn-serving
+    spec:
+      containers:
+        - name: churn-serving
+          image: ghcr.io/rania4363/churn-serving:1@sha256:884e694a1ce453c34f3ed82f5698ebcb8c494eee138dc6d35c285b944ff32181
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: MLFLOW_TRACKING_URI
+              value: http://mlflow.mlflow:5000
+            - name: GIT_PYTHON_REFRESH
+              value: quiet
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            failureThreshold: 6
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
