@@ -1,0 +1,101 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: churn-remediation
+  namespace: ml-training
+spec:
+  entrypoint: main
+  serviceAccountName: argo-workflow-runner
+  ttlStrategy:
+    secondsAfterCompletion: 86400
+  arguments:
+    parameters:
+      - name: drift
+        value: "0.6"
+      - name: n-samples
+        value: "5000"
+  templates:
+    - name: main
+      steps:
+        - - name: retrain
+            template: retrain
+        - - name: evaluate
+            template: evaluate
+        - - name: approval
+            template: approval
+            when: "{{steps.evaluate.outputs.parameters.verdict}} == pass"
+        - - name: promote
+            template: promote
+            when: "{{steps.evaluate.outputs.parameters.verdict}} == pass"
+
+    - name: retrain
+      container:
+        image: ghcr.io/rania4363/churn-training:6@sha256:7213fdfb724b045afcd621b2360002add442304a456de009dbe9487be7a6f223
+        env:
+          - name: MLFLOW_TRACKING_URI
+            value: http://mlflow.mlflow:5000
+          - name: GIT_PYTHON_REFRESH
+            value: quiet
+          - name: DRIFT
+            value: "{{workflow.parameters.drift}}"
+          - name: N_SAMPLES
+            value: "{{workflow.parameters.n-samples}}"
+        resources:
+          requests: {cpu: 500m, memory: 512Mi}
+          limits: {cpu: "2", memory: 2Gi}
+        securityContext:
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+
+    - name: evaluate
+      container:
+        image: ghcr.io/rania4363/churn-training:6@sha256:7213fdfb724b045afcd621b2360002add442304a456de009dbe9487be7a6f223
+        command: ["sh", "-c"]
+        args:
+          - |
+            python evaluate.py > /tmp/eval.log 2>&1
+            rc=$?
+            cat /tmp/eval.log
+            [ $rc -eq 0 ] || exit $rc
+            if grep -q "EVALUATION: PASS" /tmp/eval.log; then
+              printf pass > /tmp/verdict
+            else
+              printf fail > /tmp/verdict
+            fi
+        env:
+          - name: MLFLOW_TRACKING_URI
+            value: http://mlflow.mlflow:5000
+          - name: GIT_PYTHON_REFRESH
+            value: quiet
+          - name: DRIFT
+            value: "{{workflow.parameters.drift}}"
+        resources:
+          requests: {cpu: 500m, memory: 512Mi}
+          limits: {cpu: "2", memory: 2Gi}
+        securityContext:
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+      outputs:
+        parameters:
+          - name: verdict
+            valueFrom:
+              path: /tmp/verdict
+
+    - name: approval
+      suspend: {}
+
+    - name: promote
+      container:
+        image: ghcr.io/rania4363/churn-agent:2@sha256:d9a80eb05309cd924d1bc1eb49fe3d539e9e58dfbbc042a0908e9e21c59b632b
+        command: ["python", "promote.py"]
+        env:
+          - name: MLFLOW_TRACKING_URI
+            value: http://mlflow.mlflow:5000
+          - name: SERVING_URL
+            value: http://churn-serving.ml-serving
+        resources:
+          requests: {cpu: 250m, memory: 256Mi}
+          limits: {cpu: "1", memory: 1Gi}
+        securityContext:
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
