@@ -19,7 +19,7 @@ spec:
   templates:
     - name: train
       container:
-        image: ghcr.io/rania4363/churn-training:8@sha256:e839fabc115db72f77ebbdb9ddaddb17e2241dae411269da1a93418de54147ed
+        image: ghcr.io/rania4363/churn-training:9@sha256:8e22ec6230d7c9df16ada33a6891778e3f580a401dea6d044d7c938dae2f4f67
         env:
           - name: MLFLOW_TRACKING_URI
             value: http://mlflow.mlflow:5000
