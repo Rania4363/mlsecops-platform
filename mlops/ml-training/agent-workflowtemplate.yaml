@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: churn-agent-observe
+  namespace: ml-training
+spec:
+  entrypoint: observe
+  serviceAccountName: argo-workflow-runner
+  ttlStrategy:
+    secondsAfterCompletion: 3600
+  templates:
+    - name: observe
+      container:
+        image: ghcr.io/rania4363/churn-agent:1@sha256:73a5d35cb7516f6aa4af35f3ecf0b61f8375f99386d3a07f5e3e44579679d9c0
+        env:
+          - name: MLFLOW_TRACKING_URI
+            value: http://mlflow.mlflow:5000
+        resources:
+          requests:
+            cpu: 250m
+            memory: 256Mi
+          limits:
+            cpu: "1"
+            memory: 1Gi
+        securityContext:
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
