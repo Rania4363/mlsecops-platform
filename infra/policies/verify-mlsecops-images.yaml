@@ -29,6 +29,8 @@ spec:
             - issuer: "https://token.actions.githubusercontent.com"
               subject: "https://github.com/Rania4363/mlsecops-images/.github/workflows/training.yml@refs/heads/main"
             - issuer: "https://token.actions.githubusercontent.com"
+              subject: "https://github.com/Rania4363/mlsecops-images/.github/workflows/agent.yml@refs/heads/main"
+            - issuer: "https://token.actions.githubusercontent.com"
               subject: "https://github.com/Rania4363/mlsecops-images/.github/workflows/serving.yml@refs/heads/main"
   validations:
     - expression: >-
