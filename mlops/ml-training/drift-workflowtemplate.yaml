@@ -17,7 +17,7 @@ spec:
   templates:
     - name: drift
       container:
-        image: ghcr.io/rania4363/churn-training:6@sha256:7213fdfb724b045afcd621b2360002add442304a456de009dbe9487be7a6f223
+        image: ghcr.io/rania4363/churn-training:7@sha256:1244c9e2ff4bdc35994c276057302a13278f2d12bafea3898fd23cf4eccc2f49
         command: ["python", "drift.py"]
         env:
           - name: MLFLOW_TRACKING_URI
