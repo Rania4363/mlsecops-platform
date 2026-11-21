@@ -11,7 +11,7 @@ spec:
   templates:
     - name: observe
       container:
-        image: ghcr.io/rania4363/churn-agent:2@sha256:d9a80eb05309cd924d1bc1eb49fe3d539e9e58dfbbc042a0908e9e21c59b632b
+        image: ghcr.io/rania4363/churn-agent:3@sha256:676ce1c5ec851fcd54a7210212dbfc07bee4be0827cbc6b29b4aac318d29943c
         env:
           - name: MLFLOW_TRACKING_URI
             value: http://mlflow.mlflow:5000
